@@ -49,7 +49,13 @@ if __name__ == '__main__':
     element_list = a.get_chemical_symbols()
 
 
-    molecule = Structure(coordinates=coordinate_list, symbols= element_list, charge=0, multiplicity=2)
+    #molecule = Structure(coordinates=coordinate_list, symbols= element_list, charge=0, multiplicity=1)
+
+    molecule = Structure(coordinates=[[0.0, 0.0, 0.0],
+                                      [0.0, 0.0, 0.9]],
+                         symbols=['H', 'H'],
+                         charge=0,
+                         multiplicity=1)
 
     #print(molecule)
 
@@ -57,20 +63,36 @@ if __name__ == '__main__':
                                    max_scf_cycles=Test.max_scf_cycles, geom_opt_max_cycles=Test.geom_opt_max_cycles,
                                    scf_convergence=Test.scf_convergence)
 
-    # try:
-    #     output = get_output_from_qchem(txt_input, processors=8, force_recalculation=True,
-    #                                    store_full_output=True)
-    # except OutputError as e:
-    #     output = 'Error'
-    #     print("Calculation ended with errors. Error lines: ")
-    #     print(e.error_lines)
-    #
+    try:
+        output = get_output_from_qchem(txt_input, processors=8, force_recalculation=True,
+                                       store_full_output=True)
+    except OutputError as e:
+        output = 'Error'
+        print("Calculation ended with errors. Error lines: ")
+        print(e.error_lines)
+
     # print(output)
 
-    for x in range(10):
-        output_filename = args["inputXYZfile"].replace('.xyz', '{}.out'.format(x))
+    for x in range(len(geom_opt_max_cycles_l)):
+        output_filename = args["inputXYZfile"].replace('.xyz', '{}.txt'.format(x))
         Test2 = Job()
         Test2.input_variation(args['parameter'],geom_opt_max_cycles_l)
-        Test2.printJob()
+        #Test2.printJob()
 
         print(output_filename)
+
+        directory = "TestResults"
+
+        path = os.path.join(os.getcwd(), directory)
+        print(path)
+
+        # try:
+        #     os.mkdir(path)
+        # except OSError as error:
+        #     print("Directory already exists")
+
+        f = open(path + "\\" +output_filename, "w")
+        f.write(output)
+        # f = open(output_filename, "r")
+        # print(f.read())
+        f.close()
