@@ -60,7 +60,7 @@ if __name__ == '__main__':
     #print(molecule)
 
     for x in range(len(geom_opt_max_cycles_l)):
-        
+
 
         txt_input = create_qchem_input(molecule, jobtype=Test.jobtype, gui=Test.gui,basis=Test.basis,method=Test.method,
                                        max_scf_cycles=Test.max_scf_cycles, geom_opt_max_cycles=Test.geom_opt_max_cycles,
@@ -78,8 +78,8 @@ if __name__ == '__main__':
 
 
         output_filename = args["inputXYZfile"].replace('.xyz', '{}.txt'.format(x))
-        Test2 = Job()
-        Test2.input_variation(args['parameter'],geom_opt_max_cycles_l)
+
+        Test.input_variation(args['parameter'],geom_opt_max_cycles_l)
         #Test2.printJob()
 
         print(output_filename)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
         except OSError as error:
             print("Directory already exists")
 
-        f = open(path + "\\" +output_filename, "w")
+        f = open(path + "/" +output_filename, "w")
         f.write(output)
         # f = open(output_filename, "r")
         # print(f.read())
