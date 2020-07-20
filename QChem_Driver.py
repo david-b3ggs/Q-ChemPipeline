@@ -59,21 +59,24 @@ if __name__ == '__main__':
 
     #print(molecule)
 
-    txt_input = create_qchem_input(molecule, jobtype=Test.jobtype, gui=Test.gui,basis=Test.basis,method=Test.method,
-                                   max_scf_cycles=Test.max_scf_cycles, geom_opt_max_cycles=Test.geom_opt_max_cycles,
-                                   scf_convergence=Test.scf_convergence)
+    for x in range(len(geom_opt_max_cycles_l)):
+        
 
-    try:
-        output = get_output_from_qchem(txt_input, processors=8, force_recalculation=True,
-                                       store_full_output=True)
-    except OutputError as e:
-        output = 'Error'
-        print("Calculation ended with errors. Error lines: ")
-        print(e.error_lines)
+        txt_input = create_qchem_input(molecule, jobtype=Test.jobtype, gui=Test.gui,basis=Test.basis,method=Test.method,
+                                       max_scf_cycles=Test.max_scf_cycles, geom_opt_max_cycles=Test.geom_opt_max_cycles,
+                                       scf_convergence=Test.scf_convergence)
+
+        try:
+            output = get_output_from_qchem(txt_input, processors=8, force_recalculation=True,
+                                           store_full_output=True)
+        except OutputError as e:
+            output = 'Error'
+            print("Calculation ended with errors. Error lines: ")
+            print(e.error_lines)
 
     # print(output)
 
-    for x in range(len(geom_opt_max_cycles_l)):
+
         output_filename = args["inputXYZfile"].replace('.xyz', '{}.txt'.format(x))
         Test2 = Job()
         Test2.input_variation(args['parameter'],geom_opt_max_cycles_l)
@@ -86,10 +89,10 @@ if __name__ == '__main__':
         path = os.path.join(os.getcwd(), directory)
         print(path)
 
-        # try:
-        #     os.mkdir(path)
-        # except OSError as error:
-        #     print("Directory already exists")
+        try:
+            os.mkdir(path)
+        except OSError as error:
+            print("Directory already exists")
 
         f = open(path + "\\" +output_filename, "w")
         f.write(output)
