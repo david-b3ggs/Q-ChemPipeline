@@ -13,12 +13,10 @@ method_l = ['b3lyp', 'hf', 'pbe0', 'wb97x-d3', 'wb97x-v']
 max_scf_cylces_l = [400, 800, 1000]
 max_diis_cycles_l = [400, 600, 800, 1000]
 geo_opt_max_cycles_l = [400, 600 ,551, 800, 1000]
-scf_convergence_l = [8, 9, 10 ,11]
+scf_convergence_l = [8, 9, 10, 11]
 
 
 #Job you run the most often?
-
-
 
 class switch(object):
     value = None
@@ -110,8 +108,6 @@ class Job:
                 break
             print("Please Enter a valid parameter")
         Job.l_iterator = Job.l_iterator + 1
-
-
 
 
 

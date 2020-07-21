@@ -12,8 +12,8 @@ basis_l = ['6-31G*']
 method_l = ['b3lyp', 'hf', 'pbe0', 'wb97x-d3', 'wb97x-v']
 max_scf_cylces_l = [400, 800, 1000]
 max_diis_cycles_l = [400, 600, 800, 1000]
-geo_opt_max_cycles_l = [400, 600 ,551, 800, 1000]
-scf_convergence_l = [8, 9, 10 ,11]
+geom_opt_max_cycles_l = [400, 600, 551, 800, 1000]
+scf_convergence_l = [8, 9, 10, 11]
 
 
 #Job you run the most often?
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     #mol = molecule('C2H6')
 
     for x in range(args['num_of_jobs']):
-        calc = QChem(label=f'calc/{args["inputXYZfile"]}/{args['inputXYZfile']}{x}',
+        calc = QChem(label=f'calc/{args["inputXYZfile"]}/{args["inputXYZfile"]}{x}',
                          method=Test.method,
                          basis='6-31+G*')
         a.calc = calc
