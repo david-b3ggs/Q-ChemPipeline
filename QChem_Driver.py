@@ -98,7 +98,7 @@ if __name__ == '__main__':
         output_filename = args["inputXYZfile"].replace('.xyz', '{}.out'.format(x))
 
         freq_file = output_filename
-        freq_file = freq_file.replace('{}.out'.format(x), 'Freq{}.out'.format(x))
+        freq_file = freq_file.replace('{}.out'.format(x), 'Freq{}.txt'.format(x))
 
 
         Test.input_variation(args['parameter'], geom_opt_max_cycles_l)
@@ -120,7 +120,7 @@ if __name__ == '__main__':
         #f.write(output)
 
         for i, mode in enumerate(parsed_data['modes']):
-            f_freq.write('mode:                      {}'.format(i + 1))
+            f_freq.write('mode:                      {}\n'.format(i + 1))
             f_freq.write('force constant (mdyne/A):  {:10.5f}\n'.format(mode['force_constant']))
             if float(mode['frequency']) >= 0:
                 f_freq.write('frequency (cm-1):          {:10.2f}'.format(mode['frequency']))
