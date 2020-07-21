@@ -1,4 +1,5 @@
 from ase.io import read, write
+import sys
 import os.path
 from os import path
 import argparse
@@ -100,7 +101,7 @@ class Job:
             if case('max_diis_cycles'):
                 self.max_diis_cycles = param_value[Job.l_iterator]
                 break
-            if case('geo_opt_max_cycles'):
+            if case('geom_opt_max_cycles'):
                 self.geom_opt_max_cycles = param_value[Job.l_iterator]
                 break
             if case('scf_convergence'):
@@ -130,17 +131,10 @@ class Job:
 
 
 if __name__ == '__main__':
+    sys.path.append(".")
     Test = Job()
 
     for x in range(10):
         print(f'JOB {x}')
         Test.input_variation(param_name='method', param_value=method_l)
         Test.printJob()
-
-
-
-
-
-
-
-
