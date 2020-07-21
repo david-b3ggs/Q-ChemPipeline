@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
         f = open(path + "/" + output_filename, "w")
         f_freq = open(path + "/" + freq_file, "w")
-        #f.write(output)
+        f.write(output)
 
         for i, mode in enumerate(parsed_data['modes']):
             f_freq.write('mode:                      {}\n'.format(i + 1))
