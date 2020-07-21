@@ -29,7 +29,6 @@ def case(*args):
     return any((arg == switch.value for arg in args))
 
 
-
 class Job:
     l_iterator = 0
 
@@ -47,23 +46,12 @@ class Job:
     # Function that is used to extract data from an XYZ files, both coordinates and elements.
     # Returns a list of list containing both, where the elements are appended to the end
 
-    def readXYZ(self):
-        ap = argparse.ArgumentParser()
-        ap.add_argument("inputXYZfile", help='input file')
-        args = vars(ap.parse_args())
+    def readXYZ(self, file):
 
-        try:
-            a = read(args["inputXYZfile"])
-        except FileNotFoundError:
-            print('Not such file exists')
+        file.readline()
+        file.readline()
 
-        coordinate_list = a.get_positions().tolist()
-
-
-        element_list = a.get_chemical_symbols()
-
-        for x in range(len(element_list)):
-            coordinate_list[x].append(element_list[x])
+        coordinate_list = file.readlines()[2:]
         return coordinate_list
 
     def printJob(self):
@@ -75,6 +63,42 @@ class Job:
         print(f'max_diis_cycles is {self.max_diis_cycles}')
         print(f'geom_opt_max_cycles is {self.geom_opt_max_cycles}')
         print(f'scf_convergence is {self.scf_convergence}')
+
+    # Need to ask about multiple jobs in next meeting. Like when the occur outside of opt => freq
+    def createStartInputFile(self, mol_name, coordinates):
+        file = open(mol_name + ".in", "w+")
+        # print molecule, then rem, then comments
+        file.write(" $molecule\n 0 1\n")
+        for x in coordinates:
+            file.write(x + "\n")
+        file.write("$end \n")
+
+        file.write("$rem")
+        file.write("jobtype " + self.jobtype + "\n")
+        file.write("gui " + self.gui + '\n')
+        file.write("basis " + self.basis + '\n')
+        file.write("method " + self.method + '\n')
+        file.write("max_scf_cycles " + self.max_scf_cycles + '\n')
+        file.write("max_diis_cycles " + self.max_diis_cycles + '\n')
+        file.write("geom_opt_max_cycles " + self.geom_opt_max_cycles + '\n')
+        file.write("$end\n")
+
+        file.write("@@@\n")
+        file.write("$molecule\nread\n$end\n")
+
+        file.write("$rem")
+        file.write("jobtype freq" + "\n")
+        file.write("gui " + self.gui + '\n')
+        file.write("basis " + self.basis + '\n')
+        file.write("max_scf_cycles " + self.max_scf_cycles + '\n')
+        file.write("exchange b3lyp\n")
+        file.write("$end\n")
+
+        file.close()
+        return file.name
+
+   # def createCDFTCIFile(self, molName, coordinates):
+
 
     def input_variation(self, param_name, param_value):
         #param_name = param_name.lower()
