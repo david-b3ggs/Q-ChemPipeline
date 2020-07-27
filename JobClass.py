@@ -55,14 +55,14 @@ class Job:
         return coordinate_list
 
     def printJob(self):
-        print(f'jobtype is {self.jobtype}')
-        print(f'gui is {self.gui}')
-        print(f'basis is {self.basis}')
-        print(f'method is  {self.method}')
-        print(f'max_scf_cycles is {self.max_scf_cycles}')
-        print(f'max_diis_cycles is {self.max_diis_cycles}')
-        print(f'geom_opt_max_cycles is {self.geom_opt_max_cycles}')
-        print(f'scf_convergence is {self.scf_convergence}')
+        print('jobtype is {self.jobtype}')
+        print('gui is {self.gui}')
+        print('basis is {self.basis}')
+        print('method is  {self.method}')
+        print('max_scf_cycles is {self.max_scf_cycles}')
+        print('max_diis_cycles is {self.max_diis_cycles}')
+        print('geom_opt_max_cycles is {self.geom_opt_max_cycles}')
+        print('scf_convergence is {self.scf_convergence}')
 
     # Need to ask about multiple jobs in next meeting. Like when the occur outside of opt => freq
     def createStartInputFile(self, mol_name, coordinates):

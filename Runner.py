@@ -55,7 +55,6 @@ class Runner:
             self.optFreqOutput = self.runOptFreq()
 
 
-
     # Returns a filename of optOutput
     def runOptFreq(self):
         subprocess.run("#PBS -l nodes=1:ppn=8 -q polarbear\n#PBS -m abe -M Nishattasnim_liza1@baylor.edu"
@@ -65,7 +64,6 @@ class Runner:
 
 """
     def runCDFTCI(self):
-
 
     def runAllJobs(self):
 """

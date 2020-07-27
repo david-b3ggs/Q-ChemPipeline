@@ -46,11 +46,11 @@ class Parser:
     def __findLast(self, infile, stri):
         infile.readline()
         count = 0
-        line = self.readUntil(infile, stri)
+        line = self.__readUntil(infile, stri)
 
         while line != "":
             count += 1
-            line = self.readUntil(infile, stri)
+            line = self.__readUntil(infile, stri)
 
         return line
 
@@ -159,8 +159,8 @@ class Parser:
             print("Could not open File")
             sys.exit(-1)
 
-        self.readUntil(chemFile, "$rem")
-        self.readUntil(chemFile, "$rem")
+        self.__readUntil(chemFile, "$rem")
+        self.__readUntil(chemFile, "$rem")
         outputFile.write("FIRST JOB\n")
         outputFile.write("TYPE: ")
 
@@ -190,10 +190,10 @@ class Parser:
 
         start = chemFile.tell()
 
-        self.parseRunner(atomGroups, chemFile, isCDFT, isCDFTCI, isFreq, isOpt, isSP, outputFile, start)
+        self.__parseRunner(atomGroups, chemFile, isCDFT, isCDFTCI, isFreq, isOpt, isSP, outputFile, start)
 
-        if self.readUntil(chemFile, "$rem") != "":
-            params = self.readUntil(chemFile, "$rem")
+        if self.__readUntil(chemFile, "$rem") != "":
+            params = self.__readUntil(chemFile, "$rem")
             outputFile.write("\n\nSECOND JOB \n")
             outputFile.write("TYPE: ")
 
@@ -220,17 +220,17 @@ class Parser:
                     outputFile.write("FREQ ")
                 params = chemFile.readline()
             start = chemFile.tell()
-            self.parseRunner(atomGroups, chemFile, isCDFT, isCDFTCI, isFreq, isOpt, isSP, outputFile, start)
+            self.__parseRunner(atomGroups, chemFile, isCDFT, isCDFTCI, isFreq, isOpt, isSP, outputFile, start)
 
         chemFile.close()
         outputFile.close()
 
     def __parseRunner(self, atomGroups, chemFile, isCDFT, isCDFTCI, isFreq, isOpt, isSP, outputFile, start):
 
-        if self.readUntil(chemFile, "OPTIMIZATION CONVERGED") == "":
-            angst = self.readUntil(chemFile, "Nuclear Orientation (Angstroms)")
+        if self.__readUntil(chemFile, "OPTIMIZATION CONVERGED") == "":
+            angst = self.__readUntil(chemFile, "Nuclear Orientation (Angstroms)")
             while angst != "":
-                angst = self.readUntil(chemFile, "Nuclear Orientation (Angstroms)")
+                angst = self.__readUntil(chemFile, "Nuclear Orientation (Angstroms)")
 
             outputFile.write("\n\nInput Coordinates\n")
             outputFile.write("Atom           X                Y                Z\n")
@@ -254,53 +254,53 @@ class Parser:
             outputFile.write(angstrom.lstrip())
             angstrom = chemFile.readline()
 
-            while self.hasNumbers(angstrom):
+            while self.__hasNumbers(angstrom):
                 outputFile.write(angstrom.lstrip()[2:].lstrip())
                 angstrom = chemFile.readline()
         # If the file is a cdft type
         if isCDFT == 1 or isCDFTCI == 1:
             chemFile.seek(start)
-            block = self.readUntil(chemFile, "$cdft")
+            block = self.__readUntil(chemFile, "$cdft")
             while "$end" not in block:
                 block = chemFile.readline()
                 outputFile.write(block)
 
-            self.readUntil(chemFile, "Final Multiplier")
-            self.readUntil(chemFile, "Final Multiplier")
+            self.__readUntil(chemFile, "Final Multiplier")
+            self.__readUntil(chemFile, "Final Multiplier")
             beckeEnergy = chemFile.readline()
             outputFile.write("Becke Prior Energy Line: " + beckeEnergy.lstrip())
 
             outputFile.write('\n')
             if isCDFT == 1:
-                beckeLine = self.readUntil(chemFile, "CDFT Becke Populations")
+                beckeLine = self.__readUntil(chemFile, "CDFT Becke Populations")
                 while beckeLine != "":
-                    self.readUntil(chemFile, "Final Multiplier")
-                    self.readUntil(chemFile, "Final Multiplier")
+                    self.__readUntil(chemFile, "Final Multiplier")
+                    self.__readUntil(chemFile, "Final Multiplier")
                     beckeEnergy = chemFile.readline()
-                    beckeLine = self.readUntil(chemFile, "CDFT Becke Populations")
+                    beckeLine = self.__readUntil(chemFile, "CDFT Becke Populations")
 
                 outputFile.write("Becke Prior Energy Line: " + beckeEnergy.lstrip())
-                self.extractAtoms(chemFile, outputFile, atomGroups)
+                self.__extractAtoms(chemFile, outputFile, atomGroups)
 
             elif isCDFTCI == 1:
-                beckeLine = self.readUntil(chemFile, "CDFT Becke Populations")
+                beckeLine = self.__readUntil(chemFile, "CDFT Becke Populations")
                 stateNumber = 1
                 while beckeLine != "":
                     outputFile.write("State #" + str(stateNumber) + '\n')
-                    self.extractAtoms(chemFile, outputFile, atomGroups)
-                    self.readUntil(chemFile, "Final Multiplier")
-                    self.readUntil(chemFile, "Final Multiplier")
+                    self.__extractAtoms(chemFile, outputFile, atomGroups)
+                    self.__readUntil(chemFile, "Final Multiplier")
+                    self.__readUntil(chemFile, "Final Multiplier")
                     beckeEnergy = chemFile.readline()
 
                     if "Convergence criterion" in beckeEnergy:
                         outputFile.write("Becke Prior Energy Line: " + beckeEnergy.lstrip())
 
-                    beckeLine = self.readUntil(chemFile, "CDFT Becke Populations")
+                    beckeLine = self.__readUntil(chemFile, "CDFT Becke Populations")
                     stateNumber += 1
 
-            if isCDFTCI == 1 and self.readUntil(chemFile, "Hamiltonian matrix in orthogonalized basis") != "":
+            if isCDFTCI == 1 and self.__readUntil(chemFile, "Hamiltonian matrix in orthogonalized basis") != "":
                 # read until matrix in orthogonalized, then extract matrix, and diagonals
-                self.readUntil(chemFile, "Hamiltonian matrix in orthogonalized basis")
+                self.__readUntil(chemFile, "Hamiltonian matrix in orthogonalized basis")
                 outputFile.write("Hamiltonian Matrix in orthognialized basis\n")
                 matrixString = chemFile.readline()
                 matrixLine = matrixString.lstrip()[1:].split()
@@ -320,7 +320,7 @@ class Parser:
             chemFile.seek(start)
 
             if isOpt == 1:
-                finalEnergy = self.readUntil(chemFile, "Final energy is").lstrip().rstrip()
+                finalEnergy = self.__readUntil(chemFile, "Final energy is").lstrip().rstrip()
                 outputFile.write("Final Energy  (Hartree, eV):\t")
                 energy = finalEnergy.split(' ')
                 outputFile.write(
@@ -328,13 +328,13 @@ class Parser:
 
                 outputFile.write('\n')
 
-            self.readUntil(chemFile, "Ground-State Mulliken Net Atomic Charges")
+            self.__readUntil(chemFile, "Ground-State Mulliken Net Atomic Charges")
             chemFile.readline()
 
-            self.extractAtoms(chemFile, outputFile, atomGroups)
+            self.__extractAtoms(chemFile, outputFile, atomGroups)
 
-            if self.readUntil(chemFile, "Hessian of the SCF energy") != "":
-                self.readUntil(chemFile, "Hessian of the SCF Energy")
+            if self.__readUntil(chemFile, "Hessian of the SCF energy") != "":
+                self.__readUntil(chemFile, "Hessian of the SCF Energy")
 
                 chemFile.readline()
                 hessianLine = chemFile.readline().lstrip()
@@ -369,7 +369,7 @@ class Parser:
                         outputFile.write('{:13}'.format(str(number)) + " ")
                     outputFile.write("\n")
 
-            currentLine = self.readUntil(chemFile, "Mode: ")
+            currentLine = self.__readUntil(chemFile, "Mode: ")
 
             if currentLine != "":
                 frequencies = []
@@ -385,21 +385,21 @@ class Parser:
                     for freq in words:
                         frequencies.append(float(freq))
 
-                    currentLine = self.readUntil(chemFile, "Mode: ")
+                    currentLine = self.__readUntil(chemFile, "Mode: ")
 
                 outputFile.write("\nMaxMode: " + str(modeMax) + '\n')
                 outputFile.write("List of Frequencies: ")
                 for f in frequencies:
                     outputFile.write(str(f) + " ")
 
-            if self.readUntil(chemFile, "STANDARD THERMODYNAMIC QUANTITIES") != "":
+            if self.__readUntil(chemFile, "STANDARD THERMODYNAMIC QUANTITIES") != "":
                 outputFile.write(chemFile.readline())
                 outputFile.write(chemFile.readline())
         chemFile.seek(start)
         aMinus = ""
         vMinus = ""
-        if self.readUntil(chemFile, "Alpha MOs") != "":
-            self.findLast(chemFile, "Alpha MOs")
+        if self.__readUntil(chemFile, "Alpha MOs") != "":
+            self.__findLast(chemFile, "Alpha MOs")
             homoLine = chemFile.readline()
             lineSplitter = homoLine.split()
 
