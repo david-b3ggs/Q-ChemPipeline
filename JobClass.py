@@ -159,6 +159,6 @@ if __name__ == '__main__':
     Test = Job()
 
     for x in range(10):
-        print(f'JOB {x}')
+        print('JOB {x}')
         Test.input_variation(param_name='method', param_value=method_l)
         Test.printJob()
