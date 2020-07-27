@@ -1,6 +1,7 @@
 from JobClass import Job
 from QChemOutputParser import Parser
 import sys
+import os
 import subprocess
 
 class Runner:
@@ -57,10 +58,13 @@ class Runner:
 
     # Returns a filename of optOutput
     def runOptFreq(self):
-        subprocess.run("#PBS -l nodes=1:ppn=8 -q polarbear\n#PBS -m abe -M Nishattasnim_liza1@baylor.edu"
-                       "\n#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
-                        "numProcs=`cat $PBS_NODEFILE | wc -l`\n"
-                        "qchem -nt $numProcs " + self.molName + ".in " + self.molName + ".out")
+        process = subprocess.run("#PBS -l nodes=1:ppn=8 -q polarbear; #PBS -m abe -M Nishattasnim_liza1@baylor.edu"
+                       ";#PBS -N " + self.molName + ";cd $PBS_O_WORKDIR;"
+                        "numProcs=`cat $PBS_NODEFILE | wc -l`;"
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out", stdout=subprocess.PIPE,
+                       shell=True, capture_output=True)
+        proc_stdout = process.communicate()[0].strip()
+        print(proc_stdout)
 
 """
     def runCDFTCI(self):
