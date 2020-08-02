@@ -2,6 +2,7 @@ from JobClass import Job
 from QChemOutputParser import Parser
 import sys
 import os
+import time
 import subprocess
 
 class Runner:
@@ -48,7 +49,7 @@ class Runner:
         inFile = self.job.createStartInputFile(self.molName, coords)
         self.optFreqOutput = self.runOptFreq()
         looker = Parser()
-        looker.parse([], self.molName + "in", self.molName + "_analysis")
+        looker.parse([], self.molName + ".out", self.molName + "_analysis")
 
         while not self.__checkFreq(self.molName + "_analysis"):
             newPoints = self.__extractOptomizedCoordinates(self.molName + "_analysis")
@@ -63,9 +64,10 @@ class Runner:
                         "numProcs=`cat $PBS_NODEFILE | wc -l`;"
                         "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out", stdout=subprocess.PIPE,
                        shell=True)
-        print("Starting Optimization and Frequency")
+        while os.path.isfile("./" + self.molName + ".out") is False:
+            time.sleep(5)
+        print("Job finished")
 
-    #def runSP(self):
 
 """
     def runCDFTCI(self):

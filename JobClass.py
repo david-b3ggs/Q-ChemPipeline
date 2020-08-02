@@ -67,7 +67,8 @@ class Job:
     # Need to ask about multiple jobs in next meeting. Like when the occur outside of opt => freq
     def createStartInputFile(self, mol_name, coordinates):
         file = open(mol_name + ".in", "w+")
-        # print molecule, then rem, then comments
+        self.make_executable("./" + mol_name + ".in")
+	# print molecule, then rem, then comments
         file.write(" $molecule\n 0 1\n")
         for x in coordinates:
             file.write(x + "\n")
@@ -98,6 +99,11 @@ class Job:
         return file.name
 
    # def createCDFTCIFile(self, molName, coordinates):
+
+    def make_executable(self, path):
+        mode = os.stat(path).st_mode
+        mode |= (mode & 0o444) >> 2    # copy R bits to X
+        os.chmod(path, mode)
 
 
     def input_variation(self, param_name, param_value):
