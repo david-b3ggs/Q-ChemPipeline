@@ -1,4 +1,5 @@
 from Runner import Runner
+# TODO: Add parameters for Pipeline
 
 def main():
     starter = Runner()

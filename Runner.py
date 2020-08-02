@@ -62,12 +62,14 @@ class Runner:
                        ";#PBS -N " + self.molName + ";cd $PBS_O_WORKDIR;"
                         "numProcs=`cat $PBS_NODEFILE | wc -l`;"
                         "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out", stdout=subprocess.PIPE,
-                       shell=True, capture_output=True)
-        proc_stdout = process.communicate()[0].strip()
-        print(proc_stdout)
+                       shell=True)
+        print("Starting Optimization and Frequency")
+
+    #def runSP(self):
 
 """
     def runCDFTCI(self):
+    
 
     def runAllJobs(self):
 """
