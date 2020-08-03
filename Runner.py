@@ -46,7 +46,9 @@ class Runner:
             sys.exit(-1)
 
         coords = self.job.readXYZ(xFile)
+        print("Generating Input File")
         inFile = self.job.createStartInputFile(self.molName, coords)
+        time.sleep(3)
         self.optFreqOutput = self.runOptFreq()
         looker = Parser()
         looker.parse([], self.molName + ".out", self.molName + "_analysis")
@@ -63,7 +65,7 @@ class Runner:
         print("#PBS -l nodes=1:ppn=8\n #PBS -m abe -M david_beggs@baylor.edu\n"
                        "#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
                         "numProcs=`cat $PBS_NODEFILE | wc -l`;\n"
-                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh")
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \"")
         processCreateSh = subprocess.run("echo \"#PBS -l nodes=1:ppn=8\n #PBS -m abe -M david_beggs@baylor.edu\n"
                        "#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
                         "numProcs=`cat $PBS_NODEFILE | wc -l`;\n"

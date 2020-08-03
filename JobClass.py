@@ -68,7 +68,7 @@ class Job:
     def createStartInputFile(self, mol_name, coordinates):
         file = open(mol_name + ".in", "w+")
         self.make_executable("./" + mol_name + ".in")
-	# print molecule, then rem, then comments
+    # print molecule, then rem, then comments
         file.write(" $molecule\n 0 1\n")
         for x in coordinates:
             file.write(x + "\n")
