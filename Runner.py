@@ -59,11 +59,12 @@ class Runner:
 
     # Returns a filename of optOutput
     def runOptFreq(self):
-        process = subprocess.run("#PBS -l nodes=1:ppn=8 -q polarbear; #PBS -m abe -M Nishattasnim_liza1@baylor.edu"
-                       ";#PBS -N " + self.molName + ";cd $PBS_O_WORKDIR;"
-                        "numProcs=`cat $PBS_NODEFILE | wc -l`;"
-                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out", stdout=subprocess.PIPE,
+        processCreateSh = subprocess.run("echo \"#PBS -l nodes=1:ppn=8 -q polarbear\n #PBS -m abe -M Nishattasnim_liza1@baylor.edu"
+                       "\n#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
+                        "numProcs=`cat $PBS_NODEFILE | wc -l`\n"
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh", stdout=subprocess.PIPE,
                        shell=True)
+        processRunSh = subprocess.run("qsub ./" + self.molName + ".sh", stdout=subprocess.PIPE, shell=True)
         while os.path.isfile("./" + self.molName + ".out") is False:
             time.sleep(5)
         print("Job finished")
