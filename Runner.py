@@ -59,16 +59,22 @@ class Runner:
 
     # Returns a filename of optOutput
     def runOptFreq(self):
-        processCreateSh = subprocess.run("echo \"#PBS -l nodes=1:ppn=8 -q polarbear\n #PBS -m abe -M Nishattasnim_liza1@baylor.edu"
-                       "\n#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
-                        "numProcs=`cat $PBS_NODEFILE | wc -l`\n"
-                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh", stdout=subprocess.PIPE,
+        print("Creating script file...")
+        print("#PBS -l nodes=1:ppn=8\n #PBS -m abe -M david_beggs@baylor.edu\n"
+                       "#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
+                        "numProcs=`cat $PBS_NODEFILE | wc -l`;\n"
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh")
+        processCreateSh = subprocess.run("echo \"#PBS -l nodes=1:ppn=8\n #PBS -m abe -M david_beggs@baylor.edu\n"
+                       "#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
+                        "numProcs=`cat $PBS_NODEFILE | wc -l`;\n"
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh;", stdout=subprocess.PIPE,
                        shell=True)
+        print("Running qsub...")
         processRunSh = subprocess.run("qsub ./" + self.molName + ".sh", stdout=subprocess.PIPE, shell=True)
         while os.path.isfile("./" + self.molName + ".out") is False:
             time.sleep(5)
         print("Job finished")
-
+        
 
 """
     def runCDFTCI(self):
