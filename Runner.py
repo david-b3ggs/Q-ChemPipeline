@@ -51,7 +51,7 @@ class Runner:
         time.sleep(3)
         self.optFreqOutput = self.runOptFreq()
         looker = Parser()
-        looker.parse([], self.molName + ".out", self.molName + "_analysis")
+        looker.parse([], "~/" + self.molName + ".out", "~/" + self.molName + "_analysis")
 
         while not self.__checkFreq(self.molName + "_analysis"):
             newPoints = self.__extractOptomizedCoordinates(self.molName + "_analysis")
@@ -69,11 +69,12 @@ class Runner:
         processCreateSh = subprocess.run("echo \"#PBS -l nodes=1:ppn=8\n #PBS -m abe -M david_beggs@baylor.edu\n"
                        "#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
                         "numProcs=`cat $PBS_NODEFILE | wc -l`;\n"
-                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh;", stdout=subprocess.PIPE,
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh ;" +
+                                         4, stdout=subprocess.PIPE,
                        shell=True)
         print("Running qsub...")
         processRunSh = subprocess.run("qsub ./" + self.molName + ".sh", stdout=subprocess.PIPE, shell=True)
-        while os.path.isfile("./" + self.molName + ".out") is False:
+        while os.path.isfile("~/" + self.molName + ".out") is False:
             time.sleep(5)
         print("Job finished")
         
