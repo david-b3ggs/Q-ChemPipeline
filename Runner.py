@@ -39,6 +39,15 @@ class Runner:
     def start(self, xyzFile, name):
         # Running default spec for standard optimization job
         self.molName = name
+        path = "./" + name
+
+        try:
+           os.mkdir(path)
+        except OSError:
+           print ("Creation of the directory %s failed" % path)
+        else:
+           print ("Successfully created the directory %s " % path)
+
         try:
             xFile = open(xyzFile, "r+")
         except IOError:
@@ -51,7 +60,7 @@ class Runner:
         time.sleep(3)
         self.optFreqOutput = self.runOptFreq()
         looker = Parser()
-        looker.parse([], "~/" + self.molName + ".out", "~/" + self.molName + "_analysis")
+        looker.parse([], "./" + self.molName + ".out", "./" + self.molName + "_analysis")
 
         while not self.__checkFreq(self.molName + "_analysis"):
             newPoints = self.__extractOptomizedCoordinates(self.molName + "_analysis")
@@ -62,28 +71,23 @@ class Runner:
     # Returns a filename of optOutput
     def runOptFreq(self):
         print("Creating script file...")
-        ctrlD = bytearray(4)
         scriptString = "\"#PBS -l nodes=1:ppn=8\n#PBS -m abe -M david_beggs@baylor.edu\nPBS -N " + self.molName +  \
-                        "\ncd $PBS_O_WORKDIR\nnumProcs=`cat $PBS_NODEFILE | wc -l`;\n" \
-                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh ;\n"
+                        "\ncd " + self.molName + "\nnumProcs=`cat $PBS_NODEFILE | wc -l`;\n" \
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > ./" + self.molName + "/" + self.molName + ".sh ;\n"
         print(scriptString)
         processCreateSh = subprocess.Popen(("echo " + scriptString).split(), stdout=subprocess.PIPE)
         processCreateSh.wait()
-        processCreateSh.communicate()
         print("Running qsub...")
-        scriptRun = "qsub ./" + self.molName + ".sh"
+        scriptRun = "qsub ./" + self.molName + "/" + self.molName +  ".sh"
         processRunSh = subprocess.Popen(scriptRun.split(), stdout=subprocess.PIPE)
         processRunSh.wait()
 
-        subprocess.Popen(("rm ../" + self.molName + ".out").split(), stdout=subprocess.PIPE)
-
-        if os.path.exists("../" + self.molName + ".out"):
-            os.remove("../" + self.molName + ".out")
 
         foundFile = 0
         while foundFile == 0:
             time.sleep(5)
-            if os.path.isfile("~/" + self.molName + ".out"):
+            print(os.path.isfile("./" + self.molName + "/" + self.molName +  ".out"))
+            if os.path.isfile("./" + self.molName + "/" + self.molName +  ".out"):
                 foundFile = 1
                 print("Located Output File")
 

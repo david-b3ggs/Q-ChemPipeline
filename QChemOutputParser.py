@@ -153,10 +153,15 @@ class Parser:
 
         # Open files
         try:
-            chemFile = open(inFileName, "r")
             outputFile = open(outFileName, "w+")
         except IOError:
-            print("Could not open File in parser")
+            print("Could not open Output File in parser")
+            sys.exit(-1)
+
+        try:
+            chemFile = open(inFileName, "r")
+        except IOError:
+            print("Could not open chem File in parser")
             sys.exit(-1)
 
         self.__readUntil(chemFile, "$rem")

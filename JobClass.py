@@ -66,15 +66,15 @@ class Job:
 
     # Need to ask about multiple jobs in next meeting. Like when the occur outside of opt => freq
     def createStartInputFile(self, mol_name, coordinates):
-        file = open(mol_name + ".in", "w+")
-        self.make_executable("./" + mol_name + ".in")
+        file = open("./" + mol_name + "/" + mol_name + ".in", "w+")
+        self.make_executable("./" + mol_name + "/" + mol_name + ".in")
     # print molecule, then rem, then comments
-        file.write(" $molecule\n 0 1\n")
+        file.write("$molecule\n 0 1\n")
         for x in coordinates:
-            file.write(x + "\n")
+            file.write(x)
         file.write("$end \n")
 
-        file.write("$rem")
+        file.write("$rem\n")
         file.write("jobtype " + self.jobtype + "\n")
         file.write("gui " + self.gui + '\n')
         file.write("basis " + self.basis + '\n')
@@ -87,7 +87,7 @@ class Job:
         file.write("@@@\n")
         file.write("$molecule\nread\n$end\n")
 
-        file.write("$rem")
+        file.write("$rem\n")
         file.write("jobtype freq" + "\n")
         file.write("gui " + self.gui + '\n')
         file.write("basis " + self.basis + '\n')
