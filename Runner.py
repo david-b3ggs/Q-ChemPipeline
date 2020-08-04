@@ -62,20 +62,15 @@ class Runner:
     # Returns a filename of optOutput
     def runOptFreq(self):
         print("Creating script file...")
-        print("#PBS -l nodes=1:ppn=8\n #PBS -m abe -M david_beggs@baylor.edu\n"
-                       "#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
-                        "numProcs=`cat $PBS_NODEFILE | wc -l`;\n"
-                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \"")
-        processCreateSh = subprocess.run("echo \"#PBS -l nodes=1:ppn=8\n #PBS -m abe -M david_beggs@baylor.edu\n"
-                       "#PBS -N " + self.molName + "\ncd $PBS_O_WORKDIR\n"
-                        "numProcs=`cat $PBS_NODEFILE | wc -l`;\n"
-                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh ;" +
-                                         4, stdout=subprocess.PIPE,
-                       shell=True)
+        ctrlD = bytearray(4)
+        scriptString = "#PBS -l nodes=1:ppn=8\n#PBS -m abe -M david_beggs@baylor.edu\nPBS -N " + self.molName + "\ncd " \
+                        "$PBS_O_WORKDIR\nnumProcs=`cat $PBS_NODEFILE | wc -l`;\n" \
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh ;\n"
+        print(scriptString)
+        processCreateSh = subprocess.call(scriptString.split(), stdout=subprocess.PIPE)
         print("Running qsub...")
-        processRunSh = subprocess.run("qsub ./" + self.molName + ".sh", stdout=subprocess.PIPE, shell=True)
-        while os.path.isfile("~/" + self.molName + ".out") is False:
-            time.sleep(5)
+        scriptRun = "qsub ./" + self.molName + ".sh"
+        processRunSh = subprocess.call(scriptRun.split(), stdout=subprocess.PIPE)
         print("Job finished")
         
 
