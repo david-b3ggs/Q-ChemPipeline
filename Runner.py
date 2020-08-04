@@ -75,6 +75,8 @@ class Runner:
         processRunSh = subprocess.Popen(scriptRun.split(), stdout=subprocess.PIPE)
         processRunSh.wait()
 
+        subprocess.Popen(("rm ../" + self.molName + ".out").split(), stdout=subprocess.PIPE)
+
         if os.path.exists("../" + self.molName + ".out"):
             os.remove("../" + self.molName + ".out")
 
