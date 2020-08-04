@@ -63,16 +63,29 @@ class Runner:
     def runOptFreq(self):
         print("Creating script file...")
         ctrlD = bytearray(4)
-        scriptString = "#PBS -l nodes=1:ppn=8\n#PBS -m abe -M david_beggs@baylor.edu\nPBS -N " + self.molName + "\ncd " \
-                        "$PBS_O_WORKDIR\nnumProcs=`cat $PBS_NODEFILE | wc -l`;\n" \
+        scriptString = "\"#PBS -l nodes=1:ppn=8\n#PBS -m abe -M david_beggs@baylor.edu\nPBS -N " + self.molName +  \
+                        "\ncd $PBS_O_WORKDIR\nnumProcs=`cat $PBS_NODEFILE | wc -l`;\n" \
                         "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > " + self.molName + ".sh ;\n"
         print(scriptString)
-        processCreateSh = subprocess.call(scriptString.split(), stdout=subprocess.PIPE)
+        processCreateSh = subprocess.Popen(("echo " + scriptString).split(), stdout=subprocess.PIPE)
+        processCreateSh.wait()
+        processCreateSh.communicate()
         print("Running qsub...")
         scriptRun = "qsub ./" + self.molName + ".sh"
-        processRunSh = subprocess.call(scriptRun.split(), stdout=subprocess.PIPE)
+        processRunSh = subprocess.Popen(scriptRun.split(), stdout=subprocess.PIPE)
+        processRunSh.wait()
+
+        if os.path.exists("../" + self.molName + ".out"):
+            os.remove("../" + self.molName + ".out")
+
+        foundFile = 0
+        while foundFile == 0:
+            time.sleep(5)
+            if os.path.isfile("~/" + self.molName + ".out"):
+                foundFile = 1
+                print("Located Output File")
+
         print("Job finished")
-        
 
 """
     def runCDFTCI(self):

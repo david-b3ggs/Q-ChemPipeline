@@ -153,7 +153,7 @@ class Parser:
 
         # Open files
         try:
-            chemFile = open(inFileName, "r+")
+            chemFile = open(inFileName, "r")
             outputFile = open(outFileName, "w+")
         except IOError:
             print("Could not open File in parser")
