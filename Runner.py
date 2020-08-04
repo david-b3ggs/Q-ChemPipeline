@@ -71,14 +71,15 @@ class Runner:
     # Returns a filename of optOutput
     def runOptFreq(self):
         print("Creating script file...")
+        scriptFile = open(self.molName + "/" + self.molName + ".sh")
         scriptString = "\"#PBS -l nodes=1:ppn=8\n#PBS -m abe -M david_beggs@baylor.edu\nPBS -N " + self.molName +  \
                         "\ncd " + self.molName + "\nnumProcs=`cat $PBS_NODEFILE | wc -l`;\n" \
                         "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > ./" + self.molName + "/" + self.molName + ".sh ;\n"
         print(scriptString)
-        processCreateSh = subprocess.Popen(("echo " + scriptString).split(), stdout=subprocess.PIPE)
-        processCreateSh.wait()
+        scriptFile.write(scriptString)
+        scriptFile.close()
         print("Running qsub...")
-        scriptRun = "qsub ./" + self.molName + "/" + self.molName +  ".sh"
+        scriptRun = "qsub ./" + self.molName + "/" + self.molName + ".sh"
         processRunSh = subprocess.Popen(scriptRun.split(), stdout=subprocess.PIPE)
         processRunSh.wait()
 
