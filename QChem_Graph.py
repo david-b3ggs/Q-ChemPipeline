@@ -3,6 +3,7 @@ import sys
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 import matplotlib.pyplot as plt
+import os.path
 #List of "keys" for the dictionaries return by the parser
 
 # 'Final_Hatree_Energy'
@@ -19,18 +20,35 @@ import matplotlib.pyplot as plt
 # 'Energy_Gap_Hartree'
 # 'Energy_Gap_eV'
 
-def createBarGraph(key, x_axis, y_axis):
+# .png .eps
+
+# Function used to simplified the creation of Bar Graphs taking in the information for both axis
+def createBarGraph(key, x_axis, y_axis, show_plot = False):
     y_pos = np.arange(len(x_axis))
     plt.bar(x_axis, y_axis, align='center', alpha=0.5)
-    #plt.xticks(x_axis, y_axis)
     plt.ylabel(key)
     plt.title(f'{key} Bar Graph')
-    plt.show()
+    directory = "BarGraph_Figures"
+
+    path = os.path.join(os.getcwd(), directory)
+    print(path)
+
+    try:
+        os.mkdir(path)
+    except OSError as error:
+        print("Directory already exists")
+    filename = key + '.png'
+    plt.savefig(path + "/" + filename)
+    if show_plot == True:
+        plt.show()
 
 
-if __name__ == "__main__":
-    Parser = Parser()
-    key = 'LOMO_Hartree'
+
+
+# Function that will extract data from a Parser object depending on the key selected. (Possible keys shown above)
+# Returns both the x and y axis of data
+
+def BarGraphInfoExtracter(key, Parser):
     try:
         f = open('fileNames.txt', "r")
         fileNames = f.readlines()
@@ -41,46 +59,67 @@ if __name__ == "__main__":
     x_axis = []
     y_axis = []
 
-    for line in fileNames:
-        #print(line.strip())
-        input_file = line.strip()
-        if input_file.endswith('.out'):
-            mol_name = input_file[:-4]
-        output_file = input_file.replace('.out', '.analysis')
-        data_dic1, data_dic2 = Parser.parse([], input_file, output_file)
+    directory = "OutputFiles"
+
+    path = os.path.join(os.getcwd(), directory)
+    print(path)
+
+    try:
+        os.mkdir(path)
+    except OSError as error:
+        print("Directory already exists")
+
+    files = []
+    # r=root, d=directories, f = files
+    for r, d, f in os.walk(path):
+        for file in f:
+            if '.out' in file:
+                mol_name = file[:-4]
+                output_file = file.replace('.out', '.analysis')
+                data_dic1, data_dic2 = Parser.parse([], file, output_file)
+
+                if key in data_dic1:
+                    #print(data_dic1[key])
+                    y_axis.append(data_dic1[key])
+                    if 'jobtype' in data_dic1:
+                        mol_name += data_dic1['jobtype']
+                        x_axis.append(mol_name)
+                    else:
+                        continue
+                    mol_name = file[:-4]
 
 
+                else:
+                    print('This job does not have the specified key')
+                    # y_axis.append(0)
+                if key in data_dic2:
+                    y_axis.append(data_dic2[key])
+                    #print(data_dic2[key])
+                    if 'jobtype' in data_dic2:
+                        mol_name += data_dic2['jobtype']
+                        x_axis.append(mol_name)
+                    else:
+                        continue
+                else:
+                    #print('This job does not have the specified key')
+                    continue
 
-        if key in data_dic1:
-            print(data_dic1[key])
-            y_axis.append(data_dic1[key])
-            if 'jobtype' in data_dic1:
-                mol_name += data_dic1['jobtype']
-                x_axis.append(mol_name)
-            else:
-                continue
-            mol_name = input_file[:-4]
-
-
-        else:
-            print('This job does not have the specified key')
-            # y_axis.append(0)
-        if key in data_dic2:
-            y_axis.append(data_dic2[key])
-            print(data_dic2[key])
-            if 'jobtype' in data_dic2:
-                mol_name += data_dic2['jobtype']
-                x_axis.append(mol_name)
-            else:
-                continue
-        else:
-            print('This job does not have the specified key')
-            # y_axis.append(0)
+    # for f in files:
+    #     print(f)
 
     print(x_axis)
     print(y_axis)
+    return x_axis, y_axis
 
-    #createBarGraph(key, x_axis, y_axis)
+if __name__ == "__main__":
+    Parser = Parser()
+    key = 'Max_Mode'
+    x_axis, y_axis = BarGraphInfoExtracter(key=key, Parser= Parser)
+    createBarGraph(key, x_axis, y_axis)
+
+
+
+
 
 
 
