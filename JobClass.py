@@ -105,7 +105,7 @@ class Job:
     # Second_axis determines which axis to apply the distance
     # If the visualizier needs to be used, change show_plot to True.
 
-    def external_charges(self, filename, element, first_axis, second_axis, show_plot=False):
+    def external_charges(self, filename, element, first_axis, second_axis, num=0.5, show_plot=False):
         try:
             a = read(filename)
         except FileNotFoundError:
@@ -154,6 +154,7 @@ class Job:
             outfile += '{0: <11.4f}'.format(x_charge)
             outfile += '{0: <11.4f}'.format(y_charge)
             outfile += '{0: <11.4f}'.format(z_charge)
+            outfile += '{0: <11.2}'.format(num)
             outfile += '\n'
 
         outfile += '$end\n'
