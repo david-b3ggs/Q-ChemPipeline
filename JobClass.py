@@ -1,6 +1,7 @@
 from ase.io import read, write
 import sys
 import os.path
+import matplotlib.pyplot as plt
 from os import path
 import argparse
 import numpy as np
@@ -98,7 +99,98 @@ class Job:
         file.close()
         return file.name
 
-   # def createCDFTCIFile(self, molName, coordinates):
+    # Function that creates the external_charges section for an SP file.
+    # Element is the specific element you are looking for
+    # First_axis parameter determines which axis will be used to create the distance
+    # Second_axis determines which axis to apply the distance
+    # If the visualizier needs to be used, change show_plot to True.
+
+    def external_charges(self, filename, element, first_axis, second_axis, show_plot=False):
+        try:
+            a = read(filename)
+        except FileNotFoundError:
+            print('Not such file exists')
+            exit(3)
+
+        index = []
+        ax = plt.axes(projection="3d")
+
+        symbol_list = a.get_chemical_symbols()
+
+        for x in range(len(symbol_list)):
+            if (symbol_list[x] == element):
+                index.append(x)
+
+        coordinate_list = a.get_positions().tolist()
+        if first_axis == 'x-axis'.lower():
+            index_finder = 0
+        elif first_axis == 'y-axis'.lower():
+            index_finder = 1
+        elif first_axis == 'z-axis'.lower():
+            index_finder = 2
+        else:
+            print('Not a valid parameter')
+            exit(5)
+
+        outfile = '$external_charges\n'
+        new_charge = abs(coordinate_list[index[0]][index_finder]) + abs(coordinate_list[index[1]][index_finder])
+
+        for x in range(len(index)):
+            ax.scatter3D(coordinate_list[index[x]][0], coordinate_list[index[x]][1], coordinate_list[index[x]][2])
+            if second_axis == 'x-axis'.lower():
+                x_charge = round(coordinate_list[index[x]][0] + new_charge, 4)
+                y_charge = round(coordinate_list[index[x]][1], 4)
+                z_charge = round(coordinate_list[index[x]][2], 4)
+            elif second_axis == 'y-axis'.lower():
+                x_charge = round(coordinate_list[index[x]][0], 4)
+                y_charge = round(coordinate_list[index[x]][1] + new_charge, 4)
+                z_charge = round(coordinate_list[index[x]][2], 4)
+            elif second_axis == 'z-axis'.lower():
+                x_charge = round(coordinate_list[index[x]][0], 4)
+                y_charge = round(coordinate_list[index[x]][1], 4)
+                z_charge = round(coordinate_list[index[x]][2] + new_charge, 4)
+
+            ax.scatter3D(x_charge, y_charge, z_charge, c='yellow')
+            outfile += '{0: <11.4f}'.format(x_charge)
+            outfile += '{0: <11.4f}'.format(y_charge)
+            outfile += '{0: <11.4f}'.format(z_charge)
+            outfile += '\n'
+
+        outfile += '$end\n'
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+        if show_plot == True:
+            plt.show()
+
+        return outfile
+
+    def createSPFile(self, mol_name, coordinates, filename):
+        file = open("./" + mol_name + "/" + mol_name + ".in", "w+")
+        self.make_executable("./" + mol_name + "/" + mol_name + ".in")
+        # print molecule, then rem, then comments
+        file.write("$molecule\n 0 1\n")
+        for x in coordinates:
+            file.write(x)
+        file.write("$end \n")
+
+        file.write(self.external_charges(filename, element='Fe', first_axis= 'x-axis', second_axis= 'y-axis'))
+
+        file.write("$rem\n")
+        file.write("jobtype " + self.jobtype + "\n")
+        file.write("gui " + self.gui + '\n')
+        file.write("basis " + self.basis + '\n')
+        file.write("method " + self.method + '\n')
+        file.write("max_scf_cycles " + self.max_scf_cycles + '\n')
+        file.write("max_diis_cycles " + self.max_diis_cycles + '\n')
+        file.write("geom_opt_max_cycles " + self.geom_opt_max_cycles + '\n')
+        file.write("$end\n")
+
+        file.close()
+        return file.name
+
+
+    # def createCDFTCIFile(self, molName, coordinates):
 
     def make_executable(self, path):
         mode = os.stat(path).st_mode
