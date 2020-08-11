@@ -3,7 +3,8 @@
 
 import sys
 import re
-
+import subprocess
+import os
 
 class Parser:
 
@@ -152,17 +153,27 @@ class Parser:
         #AG's are 2d arrays
 
         # Open files
+        hasPerms = True
         try:
-            outputFile = open(outFileName, "w+")
+            outputFile = open("./" + inFileName + "/" + outFileName , "w+")
         except IOError:
             print("Could not open Output File in parser")
             sys.exit(-1)
 
         try:
-            chemFile = open(inFileName, "r")
+            chemFile = open("./" + inFileName + "/" + inFileName, "r")
         except IOError:
-            print("Could not open chem File in parser")
-            sys.exit(-1)
+            hasPerms=False
+            print("Could not open chem File in parser, Trying to elevate permissions...")
+
+        if hasPerms is False:
+            print("Attempting to give permissions")
+            os.chmod("./"+inFileName+"/"+inFileName, 0o777)
+            try:
+               chemFile = open("./" + inFileName + "/" + inFileName, "r")
+            except IOError:
+               print("Could not give privelages")
+               sys.exit(-1)
 
         self.__readUntil(chemFile, "$rem")
         self.__readUntil(chemFile, "$rem")

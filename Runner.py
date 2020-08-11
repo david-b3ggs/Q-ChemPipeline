@@ -71,26 +71,34 @@ class Runner:
     # Returns a filename of optOutput
     def runOptFreq(self):
         print("Creating script file...")
-        scriptFile = open(self.molName + "/" + self.molName + ".sh")
-        scriptString = "\"#PBS -l nodes=1:ppn=8\n#PBS -m abe -M david_beggs@baylor.edu\nPBS -N " + self.molName +  \
-                        "\ncd " + self.molName + "\nnumProcs=`cat $PBS_NODEFILE | wc -l`;\n" \
-                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out \" > ./" + self.molName + "/" + self.molName + ".sh ;\n"
+        scriptFile = open("./" + self.molName + "/" + self.molName + ".sh",
+        "w+")
+        scriptString = "#PBS -l nodes=1:ppn=8\n#PBS -m abe -M david_beggs@baylor.edu\n#PBS -N " + self.molName +  \
+                        "\ncd /home/beggsd/Q-ChemPipeline/" + self.molName + "\nnumProcs=`cat $PBS_NODEFILE | wc -l`;\n" \
+                        "qchem -nt 8 " + self.molName + ".in " + self.molName + ".out"
         print(scriptString)
         scriptFile.write(scriptString)
         scriptFile.close()
         print("Running qsub...")
-        scriptRun = "qsub ./" + self.molName + "/" + self.molName + ".sh"
-        processRunSh = subprocess.Popen(scriptRun.split(), stdout=subprocess.PIPE)
-        processRunSh.wait()
+        scriptRun = "qsub /home/beggsd/Q-ChemPipeline/" + self.molName + "/" + self.molName + ".sh"
+        processRunSh = subprocess.check_output(scriptRun.split())
+        print(processRunSh[:len(processRunSh) - 1])
+        batchCode = str(processRunSh[:len(processRunSh) - 1])[2:len(processRunSh) - 1] + "ch"
+        print("batch code: " + batchCode)
 
 
         foundFile = 0
+        time.sleep(30)
         while foundFile == 0:
-            time.sleep(5)
-            print(os.path.isfile("./" + self.molName + "/" + self.molName +  ".out"))
-            if os.path.isfile("./" + self.molName + "/" + self.molName +  ".out"):
+            findCommand = "qstat | grep " + str(batchCode)
+            qStatAnalyze = subprocess.Popen(findCommand, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+            analyze = str(qStatAnalyze.stdout.read())[2:]
+            if batchCode not in analyze:
                 foundFile = 1
-                print("Located Output File")
+                print("Job Completed")
+            else:
+                print("Job still running")
+                time.sleep(60)
 
         print("Job finished")
 
